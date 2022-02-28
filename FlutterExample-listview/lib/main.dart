@@ -1,13 +1,15 @@
-// 1) Create a new Flutter App (in this project) and output an AppBar and some text
-// below it
-// 2) Add a button which changes the text (to any other text of your choice)
-// 3) Split the app into three widgets: App, TextControl & Text
+/*
+  Nice example of sending data to a new screen:
+  https://docs.flutter.dev/cookbook/navigation/passing-data
+  https://docs.flutter.dev/cookbook/navigation/navigate-with-arguments
+ */
 
-
+import 'package:firstassignment/secondscreen.dart';
 import 'package:flutter/material.dart';
 
 import './textdisplay.dart';
 import './button.dart';
+import 'model/todo.dart';
 
 void main() => runApp(MyApp());
 
@@ -29,13 +31,17 @@ class MyApp extends StatelessWidget {
         // or simply save your changes to "hot reload" in a Flutter IDE).
         // Notice that the counter didn't reset back to zero; the application
         // is not restarted.
-        primarySwatch: Colors.amber,
+        primarySwatch: Colors.brown,
         // This makes the visual density adapt to the platform that you run
         // the app on. For desktop platforms, the controls will be smaller and
         // closer together (more dense) than on mobile platforms.
-        visualDensity: VisualDensity.adaptivePlatformDensity,
+        visualDensity: VisualDensity.adaptivePlatformDensity,        
       ),
       home: MyHomePage(title: 'Luke App'),
+      // Define here the routes for the other app screens:
+      routes: {
+        '/secondscreen' : (ctx) => SecondScreen(),
+      } ,
     );
   }
 }
@@ -44,6 +50,10 @@ class MyApp extends StatelessWidget {
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key? key, required this.title}) : super(key: key);
 
+  // Simil overloading:
+  MyHomePage.myconstr({required this.title});
+  // final boh = MyHomePage.myconstr(title: 'Pippo',);
+  
   final String title;
 
   @override
@@ -69,6 +79,15 @@ class _MyHomePageState extends State<MyHomePage> {
       'Saluton mondo',
     ];
 
+  // Lista elementi
+  final todos = List.generate(
+    20,
+    (i) => Todo(
+    'Todo $i',
+    'A description of what needs to be done for Todo $i',
+    ),
+  );
+
   void _changeMessage() {
     setState(() {
       if(_index >= _displayMessages.length -1) 
@@ -88,13 +107,24 @@ class _MyHomePageState extends State<MyHomePage> {
         appBar: AppBar(
           title: Text(widget.title),
         ),
-        body: Column(
-          children: [
-            TextDisplay(
-              _displayMessages[_index],
-            ),
-            Button(_changeMessage, 'click me!'),            
-          ],
+        body: ListView.builder(
+          itemCount: todos.length,
+          itemBuilder: (context, index) {
+          return ListTile(
+            title: Text(todos[index].title),
+            // When a user taps the ListTile, navigate to the DetailScreen.
+            // Notice that you're not only creating a DetailScreen, you're
+            // also passing the current todo through to it.
+            onTap: () {
+              Navigator.of(context).pushNamed(
+              '/secondscreen',
+                arguments: {
+                'todo': todos[index],          
+              }
+            );
+      },
+    );
+  },
         ),      
     );
   }
