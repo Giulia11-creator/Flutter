@@ -1,3 +1,10 @@
+
+/*
+  This app example shows a list of element. If you tap on
+  an item, an alert dialog is shown. You can then delete
+  that element, getting a snackbar which confirms the action. 
+ */
+
 /*
   Nice example of sending data to a new screen:
   https://docs.flutter.dev/cookbook/navigation/passing-data
@@ -68,6 +75,26 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  
+
+  // Show a snackbar: 
+  void showSnackbar(String? text, int duration) {
+    final String message = (text==null ? 'invalid message: '+text.toString() : text.toString());
+    final snackbar = SnackBar(
+      duration: Duration(seconds: duration),
+      content: Text(message),
+      action: SnackBarAction(
+        label: 'ok',
+        onPressed: () => ScaffoldMessenger.of(context).hideCurrentSnackBar(),
+      ),
+    );   
+    if(message!=null && message.length > 0) {
+      ScaffoldMessenger.of(context).showSnackBar(snackbar);      
+    }
+  }
+
+  
+  
   var _index = 0;
 
   var _displayMessages = [
@@ -88,6 +115,12 @@ class _MyHomePageState extends State<MyHomePage> {
     ),
   );
 
+  void _deleteItem(Todo t) {
+    setState( () {
+      todos.remove(t);
+    });
+  }
+  
   void _changeMessage() {
     setState(() {
       if(_index >= _displayMessages.length -1) 
@@ -116,13 +149,39 @@ class _MyHomePageState extends State<MyHomePage> {
             // Notice that you're not only creating a DetailScreen, you're
             // also passing the current todo through to it.
             onTap: () {
+              /*
               Navigator.of(context).pushNamed(
               '/secondscreen',
                 arguments: {
                 'todo': todos[index],          
-              }
-            );
-      },
+                }
+              ); */
+              showDialog(
+                context: context,
+                builder: (ctx) => AlertDialog(
+                  title: Text(todos[index].title),
+                  content: Text(todos[index].description),
+                  actions: <Widget> [
+                    FlatButton(
+                      autofocus: true,
+                      child: Text('Delete'),
+                      onPressed: () {
+                        String item = todos[index].title;
+                        _deleteItem(todos[index]);
+                        Navigator.of(ctx).pop(true);
+                        showSnackbar("Item $item has been deleted", 10);
+                        },
+                    ),
+                    FlatButton(
+                      autofocus: true,
+                      child: Text('OK'),
+                      onPressed: () => Navigator.of(ctx).pop(true),
+                    )
+                  ] ,
+                )
+              );
+
+            },
     );
   },
         ),      
