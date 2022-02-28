@@ -1,13 +1,13 @@
-// This app gets data from Firebase RealTime database through http requests
-// https://pub.dev/packages/http
+// 1) Create a new Flutter App (in this project) and output an AppBar and some text
+// below it
+// 2) Add a button which changes the text (to any other text of your choice)
+// 3) Split the app into three widgets: App, TextControl & Text
 
-import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+
 import './textdisplay.dart';
 import './button.dart';
-import 'mynubutton.dart';
 
 void main() => runApp(MyApp());
 
@@ -29,7 +29,7 @@ class MyApp extends StatelessWidget {
         // or simply save your changes to "hot reload" in a Flutter IDE).
         // Notice that the counter didn't reset back to zero; the application
         // is not restarted.
-        primarySwatch: Colors.amber,
+        primarySwatch: Colors.blueGrey,
         // This makes the visual density adapt to the platform that you run
         // the app on. For desktop platforms, the controls will be smaller and
         // closer together (more dense) than on mobile platforms.
@@ -58,53 +58,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  
-  // Sample uri:
-  final baseurl = "https://fir-test-8ae6e-default-rtdb.firebaseio.com/messages/";
-  final postUrl = Uri.parse("https://fir-test-8ae6e-default-rtdb.firebaseio.com/messages.json");
-  final _defaultID = "-MQmNoWqFz_28AZuZgT8";
-  var _message = "";
-  var _author = "";
-  var _id = "";
-  void _setMessage(String msg, String author) {
-    setState(() {
-      _message = msg;
-      _author = author;
-      
-    });
-    print("Message from $author: $msg");
-  }
-
-  // Get last posted data
-  void doGet() {
-    if(_id.length==0)
-      _id = _defaultID;
-    http.get(Uri.parse(baseurl+_id+".json")).then( (response) {
-      var jsondata = json.decode(response.body);
-      if(jsondata['message'] != null)
-        _setMessage(jsondata['message'], jsondata['author']);
-      else 
-        _setMessage(jsondata['name'], jsondata['email']);
-      _id = "";
-    });
-  }
-
-  // Post data to Firebase
-  void doPost() {
-    http.post(postUrl, 
-      body: json.encode({
-        'name': "Pluto",
-        'email': "pluto@whitehouse.gov",
-        'zipcode': 12364,
-        'id' : 0
-      })
-    ).then( (response) {
-      var jsondata = json.decode(response.body);
-      _id = jsondata['name'];  // save id of the new document
-      _setMessage(jsondata['name'], response.statusCode.toString());
-    });
-  }
-
   var _index = 0;
 
   var _displayMessages = [
@@ -114,18 +67,7 @@ class _MyHomePageState extends State<MyHomePage> {
       'Bonjour le Monde',
       'Hola Mundo',
       'Saluton mondo',
-      'Cowabungaaaa',
     ];
-  
-  var _colors = [Colors.amber, 
-    Colors.blue, 
-    Colors.brown, 
-    Colors.deepOrange,
-    Colors.deepPurple,
-    Colors.green,
-    Colors.yellow,
-    Colors.grey
-  ];
 
   void _changeMessage() {
     setState(() {
@@ -149,14 +91,10 @@ class _MyHomePageState extends State<MyHomePage> {
         body: Column(
           children: [
             TextDisplay(
-              _message,
+              _displayMessages[_index],
             ),
-            TextDisplay(
-              _author,
-            ),
-            Button(doGet, 'http get'),
-            Button(doPost, 'http post'), 
-            //MyNuButton('Change Color', _changeMessage, _colors[_index]),           
+            Image(image: AssetImage('images/uk.png')),
+            Button(_changeMessage, 'click me!'),            
           ],
         ),      
     );
